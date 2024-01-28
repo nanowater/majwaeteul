@@ -3,13 +3,7 @@ import subprocess
 import tempfile
 import os
 
-def compile_and_run_user_code():
-    compile_and_run('USER_CODE', text_user_code, output_user_code)
-
-def compile_and_run_answer_code():
-    compile_and_run('ANSWER_CODE', text_answer_code, output_answer_code)
-
-def compile_and_run(name, text_widget, output_widget):
+def compile_and_run(name, text_widget, output_widget, inputs):
     # C++ 코드를 임시 파일에 저장
     with tempfile.NamedTemporaryFile('w', delete=False, suffix='.cc') as f:
         f.write(text_widget.get('1.0', tk.END))
@@ -24,8 +18,11 @@ def compile_and_run(name, text_widget, output_widget):
         output_widget.insert(tk.END, f'Compile Error: {compile_error.decode()}\n')
     else:
         # 컴파일된 프로그램 실행
-        run_process = subprocess.Popen([f'./{name}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        run_output, run_error = run_process.communicate()
+        run_process = subprocess.Popen([f'./{name}'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # 입력 값을 전달
+        run_input = '\n'.join([str(i.get()) for i in inputs.values()]) + '\n'
+        run_output, run_error = run_process.communicate(run_input.encode())
 
         # 실행 결과 또는 에러 출력
         if run_error:
@@ -39,33 +36,44 @@ def compile_and_run(name, text_widget, output_widget):
 # GUI 생성
 root = tk.Tk()
 
+# 정규식 입력 텍스트 박스
+regex_input = tk.Entry(root)
+regex_input.grid(row=0, column=0, columnspan=2, sticky="nsew")
+
 # 사용자 코드 입력 텍스트 박스
 text_user_code = tk.Text(root)
-text_user_code.grid(row=0, column=0, sticky="nsew")
+text_user_code.grid(row=1, column=0, sticky="nsew")
 
 # '컴파일 & 실행' 버튼
-button_user_code = tk.Button(root, text='Compile & Run User Code', command=compile_and_run_user_code)
-button_user_code.grid(row=1, column=0)
+button_user_code = tk.Button(root, text='Compile & Run User Code', command=lambda: compile_and_run('USER_CODE', text_user_code, output_user_code, inputs))
+button_user_code.grid(row=2, column=0)
 
 # 사용자 코드 출력 텍스트 박스
 output_user_code = tk.Text(root)
-output_user_code.grid(row=2, column=0, sticky="nsew")
+output_user_code.grid(row=3, column=0, sticky="nsew")
 
 # 답안 코드 입력 텍스트 박스
 text_answer_code = tk.Text(root)
-text_answer_code.grid(row=0, column=1, sticky="nsew")
+text_answer_code.grid(row=1, column=1, sticky="nsew")
 
 # '컴파일 & 실행' 버튼
-button_answer_code = tk.Button(root, text='Compile & Run Answer Code', command=compile_and_run_answer_code)
-button_answer_code.grid(row=1, column=1)
+button_answer_code = tk.Button(root, text='Compile & Run Answer Code', command=lambda: compile_and_run('ANSWER_CODE', text_answer_code, output_answer_code, inputs))
+button_answer_code.grid(row=2, column=1)
 
 # 답안 코드 출력 텍스트 박스
 output_answer_code = tk.Text(root)
-output_answer_code.grid(row=2, column=1, sticky="nsew")
+output_answer_code.grid(row=3, column=1, sticky="nsew")
+
+# 입력 값 프레임
+inputs_frame = tk.Frame(root)
+inputs_frame.grid(row=4, column=0, columnspan=2, sticky="nsew")
+
+# 입력 값
+inputs = {}
 
 # 그리드 셀 크기 조정
-root.grid_rowconfigure(0, weight=1)
-root.grid_rowconfigure(2, weight=1)
+root.grid_rowconfigure(1, weight=1)
+root.grid_rowconfigure(3, weight=1)
 root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=1)
 
