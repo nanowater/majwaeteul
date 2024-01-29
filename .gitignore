@@ -2,3 +2,4 @@ USER_CODE.cc
 ANSWER_CODE.cc
 generate_TC.py
 generated_datas/
+__pycache__/
