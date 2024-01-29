@@ -22,7 +22,7 @@ def compile_and_run(i):
 
         if compile_error:
             print(f'Compile Error: {compile_error.decode()}\n')
-            return f'Test {i+1}: Failed. Compile error.'
+            return f'Test {i}: Failed. Compile error.'
         else:
             run_process = subprocess.Popen([f'generated_datas/{executable_name}'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             run_output, run_error = run_process.communicate(inputs.encode())
@@ -33,12 +33,12 @@ def compile_and_run(i):
 
             if run_error:
                 print(f'Runtime Error: {run_error.decode()}\n')
-                return f'Test {i+1}: Failed. Runtime error.'                
+                return f'Test {i}: Failed. Runtime error.'                
 
     if comparing_txt.compare_files(f'generated_datas/OUTPUT_USER_CODE_{i}.txt',f'generated_datas/OUTPUT_ANSWER_CODE_{i}.txt'):
-        return f'Test {i+1}: Failed. Outputs do not match.'
+        return f'Test {i}: Failed. Outputs do not match.'
     else:
-        return f'Test {i+1}: Passed.'
+        return f'Test {i}: Passed.'
 
 def run_tests():
     if os.path.isdir('generated_datas'):
