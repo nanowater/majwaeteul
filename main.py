@@ -41,7 +41,8 @@ def compile_and_run(i):
         return f'Test {i+1}: Passed.'
 
 def run_tests():
-    shutil.rmtree('generated_datas')
+    if os.path.isdir('generated_datas'):
+        shutil.rmtree('generated_datas')
     os.mkdir('generated_datas')
     thread_count = int(input('Enter the number of threads: '))
     with concurrent.futures.ThreadPoolExecutor(max_workers=thread_count) as executor:
